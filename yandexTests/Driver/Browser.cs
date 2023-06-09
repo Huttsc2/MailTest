@@ -3,6 +3,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using SeleniumExtras.WaitHelpers;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace yandexTests.Driver
 {
@@ -58,7 +59,6 @@ namespace yandexTests.Driver
             IWebElement element;
             try
             {
-
                 element = fluentWait.Until(ExpectedConditions.ElementToBeClickable(By.XPath(xpath)));
             }
             catch (Exception)
@@ -80,7 +80,7 @@ namespace yandexTests.Driver
             return elements;
         }*/
 
-        public IWebElement FindVisibleElement(string xpath)
+        public IWebElement? FindVisibleElement(string xpath)
         {
             IWait<IWebDriver> fluentWait = new WebDriverWait(driver, TimeSpan.FromSeconds(30))
             {
@@ -88,11 +88,18 @@ namespace yandexTests.Driver
             };
             fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException));
             IWebElement element;
-            element = fluentWait.Until(ExpectedConditions.ElementIsVisible(By.XPath(xpath)));
+            try
+            {
+                element = fluentWait.Until(ExpectedConditions.ElementIsVisible(By.XPath(xpath)));
+            }
+            catch (Exception)
+            {
+                return null;
+            }
             return element;
         }
 
-        public List<IWebElement> FindVivsibleElements(string xpath)
+        public List<IWebElement>? FindVivsibleElements(string xpath)
         {
             IWait<IWebDriver> fluentWait = new WebDriverWait(driver, TimeSpan.FromSeconds(30))
             {
@@ -100,11 +107,18 @@ namespace yandexTests.Driver
             };
             fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException));
             List<IWebElement> elements;
-            elements = fluentWait.Until(ExpectedConditions.VisibilityOfAllElementsLocatedBy(By.XPath(xpath))).ToList();
+            try
+            {
+                elements = fluentWait.Until(ExpectedConditions.VisibilityOfAllElementsLocatedBy(By.XPath(xpath))).ToList();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
             return elements;
         }
 
-        public IWebElement FindHiddenElement(string xpath)
+        public IWebElement? FindHiddenElement(string xpath)
         {
             IWait<IWebDriver> fluentWait = new WebDriverWait(driver, TimeSpan.FromSeconds(30))
             {
@@ -112,11 +126,18 @@ namespace yandexTests.Driver
             };
             fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException));
             IWebElement element;
-            element = fluentWait.Until(ExpectedConditions.ElementExists(By.XPath(xpath)));
+            try
+            {
+                element = fluentWait.Until(ExpectedConditions.ElementExists(By.XPath(xpath)));
+            }
+            catch (Exception)
+            {
+                return null;
+            }
             return element;
         }
 
-        public List<IWebElement> FindHiddenElements(string xpath)
+        public List<IWebElement>? FindHiddenElements(string xpath)
         {
             IWait<IWebDriver> fluentWait = new WebDriverWait(driver, TimeSpan.FromSeconds(30))
             {
@@ -124,8 +145,30 @@ namespace yandexTests.Driver
             };
             fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException));
             List<IWebElement> elements;
-            elements = fluentWait.Until(ExpectedConditions.PresenceOfAllElementsLocatedBy(By.XPath(xpath))).ToList();
+            try
+            {
+                elements = fluentWait.Until(ExpectedConditions.PresenceOfAllElementsLocatedBy(By.XPath(xpath))).ToList();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
             return elements;
+        }
+
+        public void AlertAccept()
+        {
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(1));
+            IAlert alert;
+            try
+            {
+                alert = wait.Until(ExpectedConditions.AlertIsPresent());
+                alert.Accept();
+            } 
+            catch (Exception)
+            {
+
+            }
         }
 
         public void Refresh()

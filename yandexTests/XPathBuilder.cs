@@ -10,7 +10,8 @@ namespace yandexTests
     {
         public string GetXPathBySubject(string subject)
         {
-            return "//span[@title='" + subject + "']";
+            string xpath = "//span[@title='" + subject + "']";
+            return xpath;
         }
     }
 }

@@ -4,7 +4,7 @@ namespace yandexTests.Pages.Passport.Mail
 {
     public class Mail: PageBase
     {
-        public static string? Subject;
+        private static string Subject;
         public WebElement WriteLetterButton = new("//a[@href='#compose']");
         public WebElement LetterRecipientArea = new("//div[@id='compose-field-1']");
         public WebElement SubjectArea = new("//input[@name='subject']");

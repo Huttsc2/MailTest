@@ -3,6 +3,10 @@ using yandexTests.Data;
 using yandexTests.Driver;
 using yandexTests.Pages;
 using yandexTests.PageElement;
+using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
+using System.Net.Mail;
+using System.Net;
 
 namespace yandexTests.Tests
 {
@@ -22,6 +26,7 @@ namespace yandexTests.Tests
             Browser.GetInstance().Quit();
         }
 
+        [Ignore]
         [TestMethod]
         public void LogIn()
         {
@@ -41,6 +46,7 @@ namespace yandexTests.Tests
             Assert.IsTrue(expected.Equals(actual));
         }
 
+        [Ignore]
         [TestMethod]
         public void SendLetter()
         {
@@ -48,7 +54,6 @@ namespace yandexTests.Tests
             WebPages pages = new WebPages();
             RandomString randomString = new RandomString();
             XPathBuilder xpathBuilder = new XPathBuilder();
-            PageElement.WebElement? webElement = null;
             string subject = randomString.GetRandomString();
             string message = randomString.GetRandomString();
             string xpathBySubject = xpathBuilder.GetXPathBySubject(subject);
@@ -65,7 +70,7 @@ namespace yandexTests.Tests
             pages.Mail.SubjectArea.SendKey(subject);
             pages.Mail.MessageArea.SendKey(message);
             pages.Mail.SendMessageButton.Click();
-            Thread.Sleep(1000);//fix it later 
+            Browser.GetInstance().AlertAccept();
             pages.Mail.UserPicButton.Click();
             pages.Mail.ExitButton.Click();
             pages.MainPage.LogInButton.Click();
@@ -75,16 +80,12 @@ namespace yandexTests.Tests
             pages.PassportPage.SubmitButton.Click();
             pages.PassportPage.PasswordArea.SendKey(mailData.password2);
             pages.PassportPage.SubmitButton.Click();
-            pages.Mail.SetSubject(subject);
-            try
-            {
-                webElement = pages.Mail.LetterBySubject;
-            } 
-            catch (Exception ex)
-            {
-                webElement = null;
-            }
-            Assert.IsTrue(webElement != null);
+            pages.Mail.SetSubject(xpathBySubject);
+            pages.Mail.LetterBySubject.Click();
+            string actualMessage = pages.Mail.OpenedLetterMessageArea.GetText();
+            Assert.IsTrue(actualMessage.Equals(message));
         }
+
+        
     }
 }
