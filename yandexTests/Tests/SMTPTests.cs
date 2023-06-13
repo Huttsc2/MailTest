@@ -12,23 +12,24 @@ namespace yandexTests.Tests
         {
             
             string fromMail = "test1.levin@yandex.ru";
-            string fromPassword = "qxpgbbpbauntnylr";
-            //string fromPassword = "an3HJ123";
+            string fromPassword = "ufyljmqfdkbdwbkz";
 
             MailMessage message = new MailMessage();
             message.From = new MailAddress(fromMail);
             message.Subject = "subject";
             message.To.Add(new MailAddress("test2.levin@yandex.ru"));
             message.Body = "body";
+            message.BodyEncoding = System.Text.Encoding.UTF8;
 
             SmtpClient smtpClient = new SmtpClient()
             {
-                Port = 465,
+                Port = 587,
                 EnableSsl = true,
-                Timeout = 20000,
+                Timeout = 10000,
                 UseDefaultCredentials = false,
                 Host = "smtp.yandex.ru",
                 Credentials = new NetworkCredential(fromMail, fromPassword),
+                DeliveryMethod = SmtpDeliveryMethod.Network
             };
 
             try
