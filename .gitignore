@@ -34,3 +34,7 @@ bld/
 .project.lock.json
 .project.assets.json
 *.lock.json
+
+# Privat data
+
+yandexTests\MailData\MailDataTest.json

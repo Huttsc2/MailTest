@@ -1,5 +1,4 @@
 using OpenQA.Selenium;
-using yandexTests.Data;
 using yandexTests.Driver;
 using yandexTests.Pages;
 using yandexTests.PageElement;
@@ -7,6 +6,8 @@ using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
 using System.Net.Mail;
 using System.Net;
+using yandexTests.Helpers;
+using yandexTests.MailData;
 
 namespace yandexTests.Tests
 {
@@ -26,19 +27,18 @@ namespace yandexTests.Tests
             Browser.GetInstance().Quit();
         }
 
-        [Ignore]
         [TestMethod]
         public void LogIn()
         {
-            MailData mailData = new MailData();
+            User user = new TestDataReader().GetTestUser();
             WebPages pages = new WebPages();
-            string expected = mailData.login2;
+            string expected = user.Login2;
             string actual;
             pages.MainPage.Open();
             pages.MainPage.LogInButton.Click();
-            pages.PassportPage.UserNameArea.SendKey(mailData.login2);
+            pages.PassportPage.UserNameArea.SendKey(user.Login2);
             pages.PassportPage.SubmitButton.Click();
-            pages.PassportPage.PasswordArea.SendKey(mailData.password2);
+            pages.PassportPage.PasswordArea.SendKey(user.Password2);
             pages.PassportPage.SubmitButton.Click();
             pages.MainPage.UserPicButton.Click();
             actual = pages.MainPage.UserName.GetText();
@@ -46,11 +46,10 @@ namespace yandexTests.Tests
             Assert.IsTrue(expected.Equals(actual));
         }
 
-        [Ignore]
         [TestMethod]
         public void SendLetter()
         {
-            MailData mailData = new MailData();
+            User user = new TestDataReader().GetTestUser();
             WebPages pages = new WebPages();
             RandomString randomString = new RandomString();
             XPathBuilder xpathBuilder = new XPathBuilder();
@@ -59,14 +58,14 @@ namespace yandexTests.Tests
             string xpathBySubject = xpathBuilder.GetXPathBySubject(subject);
             pages.MainPage.Open();
             pages.MainPage.LogInButton.Click();
-            pages.PassportPage.UserNameArea.SendKey(mailData.login1);
+            pages.PassportPage.UserNameArea.SendKey(user.Login1);
             pages.PassportPage.SubmitButton.Click();
-            pages.PassportPage.PasswordArea.SendKey(mailData.password1);
+            pages.PassportPage.PasswordArea.SendKey(user.Password1);
             pages.PassportPage.SubmitButton.Click();
             pages.MainPage.UserPicButton.Click();
             pages.MainPage.OpenMailButton.Click();
             pages.Mail.WriteLetterButton.Click();
-            pages.Mail.LetterRecipientArea.SendKey(mailData.email2);
+            pages.Mail.LetterRecipientArea.SendKey(user.Email2);
             pages.Mail.SubjectArea.SendKey(subject);
             pages.Mail.MessageArea.SendKey(message);
             pages.Mail.SendMessageButton.Click();
@@ -76,9 +75,9 @@ namespace yandexTests.Tests
             pages.MainPage.LogInButton.Click();
             pages.PassportPage.CurrentAccountButton.Click();
             pages.PassportPage.AddAccountButton.Click();
-            pages.PassportPage.UserNameArea.SendKey(mailData.login2);
+            pages.PassportPage.UserNameArea.SendKey(user.Login2);
             pages.PassportPage.SubmitButton.Click();
-            pages.PassportPage.PasswordArea.SendKey(mailData.password2);
+            pages.PassportPage.PasswordArea.SendKey(user.Password2);
             pages.PassportPage.SubmitButton.Click();
             pages.Mail.SetSubject(xpathBySubject);
             pages.Mail.LetterBySubject.Click();
@@ -86,6 +85,55 @@ namespace yandexTests.Tests
             Assert.IsTrue(actualMessage.Equals(message));
         }
 
-        
+        [TestMethod]
+        public void SendLetterBySMTP()
+        {
+            User user = new TestDataReader().GetTestUser();
+            RandomString randomString = new RandomString();
+            WebPages pages = new WebPages();
+            XPathBuilder xpathBuilder = new XPathBuilder();
+            string subject = randomString.GetRandomString();
+            string message = randomString.GetRandomString();
+            string xpathBySubject = xpathBuilder.GetXPathBySubject(subject);
+            MailMessage mailMessage = new MailMessage();
+            mailMessage.From = new MailAddress(user.Email1);
+            mailMessage.Subject = subject;
+            mailMessage.To.Add(new MailAddress(user.Email2));
+            mailMessage.Body = message;
+            mailMessage.BodyEncoding = System.Text.Encoding.UTF8;
+
+            SmtpClient smtpClient = new SmtpClient()
+            {
+                Port = 587,
+                EnableSsl = true,
+                Timeout = 10000,
+                UseDefaultCredentials = false,
+                Host = "smtp.yandex.ru",
+                Credentials = new NetworkCredential(user.Email1, user.Password1SMTP),
+                DeliveryMethod = SmtpDeliveryMethod.Network
+            };
+
+            try
+            {
+                smtpClient.Send(mailMessage);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                Assert.Fail();
+            }
+            pages.MainPage.Open();
+            pages.MainPage.LogInButton.Click();
+            pages.PassportPage.UserNameArea.SendKey(user.Login2);
+            pages.PassportPage.SubmitButton.Click();
+            pages.PassportPage.PasswordArea.SendKey(user.Password2);
+            pages.PassportPage.SubmitButton.Click();
+            pages.MainPage.UserPicButton.Click();
+            pages.MainPage.OpenMailButton.Click();
+            pages.Mail.SetSubject(xpathBySubject);
+            pages.Mail.LetterBySubject.Click();
+            string actualMessage = pages.Mail.OpenedLetterMessageArea.GetText();
+            Assert.IsTrue(actualMessage.Equals(message));
+        }
     }
 }

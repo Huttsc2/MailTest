@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace yandexTests.Data
+namespace yandexTests.Helpers
 {
     public class RandomString
     {
