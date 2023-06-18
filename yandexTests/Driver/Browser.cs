@@ -2,8 +2,6 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using SeleniumExtras.WaitHelpers;
-using System.Text.RegularExpressions;
-using System.Xml.Linq;
 
 namespace yandexTests.Driver
 {
@@ -25,6 +23,8 @@ namespace yandexTests.Driver
 
         private ChromeDriver StartChromDriver()
         {
+            //TODO update method get chromedriver localy
+
             //string dir = Directory.GetCurrentDirectory();
             //Regex reg = new(".{0,}Selenium");
             ChromeOptions options = new ChromeOptions();
@@ -67,6 +67,9 @@ namespace yandexTests.Driver
             }
             return element;
         }
+        
+
+        //TODO make method to find all clickable elements by xpath
 
         /*public List<IWebElement> FindClickableElements(string xpath)
         {

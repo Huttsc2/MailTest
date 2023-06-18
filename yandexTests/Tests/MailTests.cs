@@ -1,9 +1,5 @@
-using OpenQA.Selenium;
 using yandexTests.Driver;
 using yandexTests.Pages;
-using yandexTests.PageElement;
-using OpenQA.Selenium.Support.UI;
-using SeleniumExtras.WaitHelpers;
 using System.Net.Mail;
 using System.Net;
 using yandexTests.Helpers;
@@ -32,6 +28,7 @@ namespace yandexTests.Tests
         {
             User user = new TestDataReader().GetTestUser();
             WebPages pages = new WebPages();
+            SoftAssertions softAssertions = new SoftAssertions();
             string expected = user.Login2;
             string actual;
             pages.MainPage.Open();
@@ -42,8 +39,8 @@ namespace yandexTests.Tests
             pages.PassportPage.SubmitButton.Click();
             pages.MainPage.UserPicButton.Click();
             actual = pages.MainPage.UserName.GetText();
-            Console.WriteLine(actual);
-            Assert.IsTrue(expected.Equals(actual));
+            softAssertions.Add("login", expected, actual);
+            softAssertions.AssertAll();
         }
 
         [TestMethod]
@@ -53,6 +50,7 @@ namespace yandexTests.Tests
             WebPages pages = new WebPages();
             RandomString randomString = new RandomString();
             XPathBuilder xpathBuilder = new XPathBuilder();
+            SoftAssertions softAssertions = new SoftAssertions();
             string subject = randomString.GetRandomString();
             string message = randomString.GetRandomString();
             string xpathBySubject = xpathBuilder.GetXPathBySubject(subject);
@@ -82,12 +80,16 @@ namespace yandexTests.Tests
             pages.Mail.SetSubject(xpathBySubject);
             pages.Mail.LetterBySubject.Click();
             string actualMessage = pages.Mail.OpenedLetterMessageArea.GetText();
-            Assert.IsTrue(actualMessage.Equals(message));
+            string actualSubject = pages.Mail.OpenedLetterSubjectArea.GetText();
+            softAssertions.Add("message", message, actualMessage);
+            softAssertions.Add("subject", subject, actualSubject);
+            softAssertions.AssertAll();
         }
 
         [TestMethod]
         public void SendLetterBySMTP()
         {
+            SoftAssertions softAssertions = new SoftAssertions();
             User user = new TestDataReader().GetTestUser();
             RandomString randomString = new RandomString();
             WebPages pages = new WebPages();
@@ -119,6 +121,7 @@ namespace yandexTests.Tests
             }
             catch (Exception ex)
             {
+                Console.WriteLine("letter was not delivered");
                 Console.WriteLine(ex.ToString());
                 Assert.Fail();
             }
@@ -133,7 +136,10 @@ namespace yandexTests.Tests
             pages.Mail.SetSubject(xpathBySubject);
             pages.Mail.LetterBySubject.Click();
             string actualMessage = pages.Mail.OpenedLetterMessageArea.GetText();
-            Assert.IsTrue(actualMessage.Equals(message));
+            string actualSubject = pages.Mail.OpenedLetterSubjectArea.GetText();
+            softAssertions.Add("message", message, actualMessage);
+            softAssertions.Add("subject", subject, actualSubject);
+            softAssertions.AssertAll();
         }
     }
 }
