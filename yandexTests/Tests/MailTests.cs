@@ -96,7 +96,6 @@ namespace yandexTests.Tests
             XPathBuilder xpathBuilder = new XPathBuilder();
             string subject = randomString.GetRandomString();
             string message = randomString.GetRandomString();
-            string xpathBySubject = xpathBuilder.GetXPathBySubject(subject);
             MailMessage mailMessage = new MailMessage();
             mailMessage.From = new MailAddress(user.Email1);
             mailMessage.Subject = subject;
@@ -133,6 +132,7 @@ namespace yandexTests.Tests
             pages.PassportPage.SubmitButton.Click();
             pages.MainPage.UserPicButton.Click();
             pages.MainPage.OpenMailButton.Click();
+            string xpathBySubject = xpathBuilder.GetXPathBySubject(subject);
             pages.Mail.SetSubject(xpathBySubject);
             pages.Mail.LetterBySubject.Click();
             string actualMessage = pages.Mail.OpenedLetterMessageArea.GetText();
