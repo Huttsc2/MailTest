@@ -2,6 +2,7 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using SeleniumExtras.WaitHelpers;
+using FluentAssertions;
 
 namespace yandexTests.Driver
 {
@@ -67,27 +68,20 @@ namespace yandexTests.Driver
             }
             return element;
         }
-        
-
-        //TODO make method to find all clickable elements by xpath
 
         public List<IWebElement> FindClickableElements(string xpath)
         {
-            IWait<IWebDriver> fluentWait = new WebDriverWait(driver, TimeSpan.FromSeconds(30))
+
+            List<IWebElement>? visibleElements = FindVivsibleElements(xpath);
+            List<IWebElement> clickableElements = new();
+            foreach (IWebElement element in visibleElements)
             {
-                PollingInterval = TimeSpan.FromMilliseconds(50),
-            };
-            fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException));
-            List<IWebElement> visibleElements;
-            try
-            {
-                visibleElements = fluentWait.Until(ExpectedConditions.VisibilityOfAllElementsLocatedBy(By.XPath(xpath))).ToList();
+                if (ExpectedConditions.ElementToBeClickable(element) != null)
+                {
+                    clickableElements.Add(element);
+                }
             }
-            catch (Exception)
-            {
-                return null;
-            }
-            return visibleElements;
+            return clickableElements;
         }
 
         public IWebElement? FindVisibleElement(string xpath)
