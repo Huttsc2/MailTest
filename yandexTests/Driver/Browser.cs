@@ -71,17 +71,24 @@ namespace yandexTests.Driver
 
         //TODO make method to find all clickable elements by xpath
 
-        /*public List<IWebElement> FindClickableElements(string xpath)
+        public List<IWebElement> FindClickableElements(string xpath)
         {
             IWait<IWebDriver> fluentWait = new WebDriverWait(driver, TimeSpan.FromSeconds(30))
             {
                 PollingInterval = TimeSpan.FromMilliseconds(50),
             };
             fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException));
-            List<IWebElement> elements;
-            elements = fluentWait.Until(ExpectedConditions.)
-            return elements;
-        }*/
+            List<IWebElement> visibleElements;
+            try
+            {
+                visibleElements = fluentWait.Until(ExpectedConditions.VisibilityOfAllElementsLocatedBy(By.XPath(xpath))).ToList();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            return visibleElements;
+        }
 
         public IWebElement? FindVisibleElement(string xpath)
         {
