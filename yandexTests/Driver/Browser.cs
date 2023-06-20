@@ -2,7 +2,6 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using SeleniumExtras.WaitHelpers;
-using FluentAssertions;
 
 namespace yandexTests.Driver
 {

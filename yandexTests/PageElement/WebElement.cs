@@ -9,10 +9,16 @@ namespace yandexTests.PageElement
         private Browser Browser = Browser.GetInstance();
         private string XPath;
         private int TimeoutInSec = 30;
+        private WebElement webElement;
 
         public WebElement(string xpath)
         {
             XPath = xpath;
+        }
+
+        public WebElement(WebElement webElement)
+        {
+            this.webElement = webElement;
         }
 
         public void SetElement(IWebElement element)

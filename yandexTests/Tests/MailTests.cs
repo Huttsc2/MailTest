@@ -49,11 +49,9 @@ namespace yandexTests.Tests
             User user = new TestDataReader().GetTestUser();
             WebPages pages = new WebPages();
             RandomString randomString = new RandomString();
-            XPathBuilder xpathBuilder = new XPathBuilder();
             SoftAssertions softAssertions = new SoftAssertions();
             string subject = randomString.GetRandomString();
             string message = randomString.GetRandomString();
-            string xpathBySubject = xpathBuilder.GetXPathBySubject(subject);
             pages.MainPage.Open();
             pages.MainPage.LogInButton.Click();
             pages.PassportPage.UserNameArea.SendKey(user.Login1);
@@ -77,8 +75,7 @@ namespace yandexTests.Tests
             pages.PassportPage.SubmitButton.Click();
             pages.PassportPage.PasswordArea.SendKey(user.Password2);
             pages.PassportPage.SubmitButton.Click();
-            pages.Mail.SetSubject(xpathBySubject);
-            pages.Mail.LetterBySubject.Click();
+            pages.Mail.getLetterBySubject(subject).Click();
             string actualMessage = pages.Mail.OpenedLetterMessageArea.GetText();
             string actualSubject = pages.Mail.OpenedLetterSubjectArea.GetText();
             softAssertions.Add("message", message, actualMessage);
@@ -93,21 +90,22 @@ namespace yandexTests.Tests
             User user = new TestDataReader().GetTestUser();
             RandomString randomString = new RandomString();
             WebPages pages = new WebPages();
-            XPathBuilder xpathBuilder = new XPathBuilder();
             string subject = randomString.GetRandomString();
             string message = randomString.GetRandomString();
-            MailMessage mailMessage = new MailMessage();
-            mailMessage.From = new MailAddress(user.Email1);
-            mailMessage.Subject = subject;
+
+            MailMessage mailMessage = new MailMessage()
+            {
+                From = new MailAddress(user.Email1),
+                Subject = subject,
+                Body = message,
+                BodyEncoding = System.Text.Encoding.UTF8
+            };
             mailMessage.To.Add(new MailAddress(user.Email2));
-            mailMessage.Body = message;
-            mailMessage.BodyEncoding = System.Text.Encoding.UTF8;
 
             SmtpClient smtpClient = new SmtpClient()
             {
                 Port = 587,
                 EnableSsl = true,
-                Timeout = 10000,
                 UseDefaultCredentials = false,
                 Host = "smtp.yandex.ru",
                 Credentials = new NetworkCredential(user.Email1, user.Password1SMTP),
@@ -124,6 +122,7 @@ namespace yandexTests.Tests
                 Console.WriteLine(ex.ToString());
                 Assert.Fail();
             }
+
             pages.MainPage.Open();
             pages.MainPage.LogInButton.Click();
             pages.PassportPage.UserNameArea.SendKey(user.Login2);
@@ -132,9 +131,7 @@ namespace yandexTests.Tests
             pages.PassportPage.SubmitButton.Click();
             pages.MainPage.UserPicButton.Click();
             pages.MainPage.OpenMailButton.Click();
-            string xpathBySubject = xpathBuilder.GetXPathBySubject(subject);
-            pages.Mail.SetSubject(xpathBySubject);
-            pages.Mail.LetterBySubject.Click();
+            pages.Mail.getLetterBySubject(subject).Click();
             string actualMessage = pages.Mail.OpenedLetterMessageArea.GetText();
             string actualSubject = pages.Mail.OpenedLetterSubjectArea.GetText();
             softAssertions.Add("message", message, actualMessage);

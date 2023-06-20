@@ -1,10 +1,10 @@
-﻿using yandexTests.PageElement;
+﻿using System.Net.Http.Headers;
+using yandexTests.PageElement;
 
 namespace yandexTests.Pages.Passport.Mail
 {
-    public class Mail: PageBase
+    public class Mail : PageBase
     {
-        private static string Subject;
         public WebElement WriteLetterButton = new("//a[@href='#compose']");
         public WebElement LetterRecipientArea = new("//div[@id='compose-field-1']");
         public WebElement SubjectArea = new("//input[@name='subject']");
@@ -15,11 +15,10 @@ namespace yandexTests.Pages.Passport.Mail
         public WebElementCollection LettersByRecipient = new("//span[@title='test1.levin@yandex.ru']");
         public WebElement OpenedLetterSubjectArea = new("//div[@class='Title_content_Q-Xik']");
         public WebElement OpenedLetterMessageArea = new("//div[@class='MessageBody_body_pmf3j react-message-wrapper__body']");
-        public WebElement LetterBySubject = new(xpath: Subject);
 
-        public void SetSubject(string subject)
+        public WebElement getLetterBySubject(string subject)
         {
-            Subject = subject;
+            return new WebElement("//span[@title='" + subject + "']");
         }
     }
 }
