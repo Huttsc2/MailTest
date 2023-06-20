@@ -1,5 +1,4 @@
-﻿using yandexTests.MailData;
-using yandexTests.Pages;
+﻿using yandexTests.Pages;
 
 namespace yandexTests.Steps
 {

@@ -1,10 +1,10 @@
 using yandexTests.Driver;
 using yandexTests.Pages;
 using System.Net.Mail;
-using System.Net;
 using yandexTests.Helpers;
 using yandexTests.MailData;
 using yandexTests.Steps;
+using yandexTests.SMTP;
 
 namespace yandexTests.Tests
 {
@@ -73,38 +73,14 @@ namespace yandexTests.Tests
             RandomString randomString = new RandomString();
             WebPages pages = new WebPages();
             MailSteps steps = new MailSteps();
+            SmtpHelpers smtp = new SmtpHelpers();
             string subject = randomString.GetRandomString();
             string message = randomString.GetRandomString();
 
-            MailMessage mailMessage = new MailMessage()
-            {
-                From = new MailAddress(user.Email1),
-                Subject = subject,
-                Body = message,
-                BodyEncoding = System.Text.Encoding.UTF8
-            };
-            mailMessage.To.Add(new MailAddress(user.Email2));
-
-            SmtpClient smtpClient = new SmtpClient()
-            {
-                Port = 587,
-                EnableSsl = true,
-                UseDefaultCredentials = false,
-                Host = "smtp.yandex.ru",
-                Credentials = new NetworkCredential(user.Email1, user.Password1SMTP),
-                DeliveryMethod = SmtpDeliveryMethod.Network
-            };
-
-            try
-            {
-                smtpClient.Send(mailMessage);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("letter was not delivered");
-                Console.WriteLine(ex.ToString());
-                Assert.Fail();
-            }
+            MailMessage mailMessage = smtp.GetMailMessage(user.Email1, subject, message);
+            smtp.AddRecipient(mailMessage, user.Email2);
+            SmtpClient smtpClient = smtp.GetClient(user.Email1, user.Password1SMTP);
+            smtp.SendLetter(smtpClient, mailMessage);
 
             pages.MainPage.Open();
             steps.Login(user.Login2, user.Password2);
