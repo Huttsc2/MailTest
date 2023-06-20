@@ -4,6 +4,7 @@ using System.Net.Mail;
 using System.Net;
 using yandexTests.Helpers;
 using yandexTests.MailData;
+using yandexTests.Steps;
 
 namespace yandexTests.Tests
 {
@@ -29,17 +30,13 @@ namespace yandexTests.Tests
             User user = new TestDataReader().GetTestUser();
             WebPages pages = new WebPages();
             SoftAssertions softAssertions = new SoftAssertions();
-            string expected = user.Login2;
-            string actual;
+            MailSteps steps = new MailSteps();
+            string expectedLogin = user.Login2;
+            string actualLogin;
             pages.MainPage.Open();
-            pages.MainPage.LogInButton.Click();
-            pages.PassportPage.UserNameArea.SendKey(user.Login2);
-            pages.PassportPage.SubmitButton.Click();
-            pages.PassportPage.PasswordArea.SendKey(user.Password2);
-            pages.PassportPage.SubmitButton.Click();
-            pages.MainPage.UserPicButton.Click();
-            actual = pages.MainPage.UserName.GetText();
-            softAssertions.Add("login", expected, actual);
+            steps.Login(user.Login2, user.Password2);
+            actualLogin = steps.GetLogin();
+            softAssertions.Add("login", expectedLogin, actualLogin);
             softAssertions.AssertAll();
         }
 
@@ -50,31 +47,16 @@ namespace yandexTests.Tests
             WebPages pages = new WebPages();
             RandomString randomString = new RandomString();
             SoftAssertions softAssertions = new SoftAssertions();
+            MailSteps steps = new MailSteps();
             string subject = randomString.GetRandomString();
             string message = randomString.GetRandomString();
             pages.MainPage.Open();
-            pages.MainPage.LogInButton.Click();
-            pages.PassportPage.UserNameArea.SendKey(user.Login1);
-            pages.PassportPage.SubmitButton.Click();
-            pages.PassportPage.PasswordArea.SendKey(user.Password1);
-            pages.PassportPage.SubmitButton.Click();
-            pages.MainPage.UserPicButton.Click();
-            pages.MainPage.OpenMailButton.Click();
-            pages.Mail.WriteLetterButton.Click();
-            pages.Mail.LetterRecipientArea.SendKey(user.Email2);
-            pages.Mail.SubjectArea.SendKey(subject);
-            pages.Mail.MessageArea.SendKey(message);
-            pages.Mail.SendMessageButton.Click();
+            steps.Login(user.Login1, user.Password1);
+            steps.OpenMail();
+            steps.SendLetter(user.Email2, subject, message);
             Browser.GetInstance().AlertAccept();
-            pages.Mail.UserPicButton.Click();
-            pages.Mail.ExitButton.Click();
-            pages.MainPage.LogInButton.Click();
-            pages.PassportPage.CurrentAccountButton.Click();
-            pages.PassportPage.AddAccountButton.Click();
-            pages.PassportPage.UserNameArea.SendKey(user.Login2);
-            pages.PassportPage.SubmitButton.Click();
-            pages.PassportPage.PasswordArea.SendKey(user.Password2);
-            pages.PassportPage.SubmitButton.Click();
+            steps.Logout();
+            steps.ReLogin(user.Login2, user.Password2);
             pages.Mail.getLetterBySubject(subject).Click();
             string actualMessage = pages.Mail.OpenedLetterMessageArea.GetText();
             string actualSubject = pages.Mail.OpenedLetterSubjectArea.GetText();
@@ -90,6 +72,7 @@ namespace yandexTests.Tests
             User user = new TestDataReader().GetTestUser();
             RandomString randomString = new RandomString();
             WebPages pages = new WebPages();
+            MailSteps steps = new MailSteps();
             string subject = randomString.GetRandomString();
             string message = randomString.GetRandomString();
 
@@ -124,13 +107,8 @@ namespace yandexTests.Tests
             }
 
             pages.MainPage.Open();
-            pages.MainPage.LogInButton.Click();
-            pages.PassportPage.UserNameArea.SendKey(user.Login2);
-            pages.PassportPage.SubmitButton.Click();
-            pages.PassportPage.PasswordArea.SendKey(user.Password2);
-            pages.PassportPage.SubmitButton.Click();
-            pages.MainPage.UserPicButton.Click();
-            pages.MainPage.OpenMailButton.Click();
+            steps.Login(user.Login2, user.Password2);
+            steps.OpenMail();
             pages.Mail.getLetterBySubject(subject).Click();
             string actualMessage = pages.Mail.OpenedLetterMessageArea.GetText();
             string actualSubject = pages.Mail.OpenedLetterSubjectArea.GetText();
