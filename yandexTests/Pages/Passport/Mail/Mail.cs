@@ -16,9 +16,18 @@ namespace yandexTests.Pages.Passport.Mail
         public WebElement OpenedLetterSubjectArea = new("//div[@class='Title_content_Q-Xik']");
         public WebElement OpenedLetterMessageArea = new("//div[@class='MessageBody_body_pmf3j react-message-wrapper__body']");
 
-        public WebElement getLetterBySubject(string subject)
+        public WebElement LetterBySubject(string subject)
         {
             return new WebElement("//span[@title='" + subject + "']");
+        }
+
+        public WebElement some
+        {
+            get
+            {
+
+                return new WebElement("");
+            }
         }
     }
 }

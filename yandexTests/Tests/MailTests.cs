@@ -27,37 +27,34 @@ namespace yandexTests.Tests
         [TestMethod]
         public void LogIn()
         {
-            User user = new TestDataReader().GetTestUser();
+            List<User> users = new TestDataReader().GetTestUsers();
             WebPages pages = new WebPages();
             SoftAssertions softAssertions = new SoftAssertions();
-            MailSteps steps = new MailSteps();
-            string expectedLogin = user.Login2;
-            string actualLogin;
+            MailSteps steps = new MailSteps(pages, users);
             pages.MainPage.Open();
-            steps.Login(user.Login2, user.Password2);
-            actualLogin = steps.GetLogin();
-            softAssertions.Add("login", expectedLogin, actualLogin);
+            steps.Login(users[1].Login, users[1].Password);
+            softAssertions.Add("login", users[1].Login, steps.GetLogin());
             softAssertions.AssertAll();
         }
 
         [TestMethod]
         public void SendLetter()
         {
-            User user = new TestDataReader().GetTestUser();
+            List<User> users = new TestDataReader().GetTestUsers();
             WebPages pages = new WebPages();
             RandomString randomString = new RandomString();
             SoftAssertions softAssertions = new SoftAssertions();
-            MailSteps steps = new MailSteps();
+            MailSteps steps = new MailSteps(pages, users);
             string subject = randomString.GetRandomString();
             string message = randomString.GetRandomString();
             pages.MainPage.Open();
-            steps.Login(user.Login1, user.Password1);
-            steps.OpenMail();
-            steps.SendLetter(user.Email2, subject, message);
-            Browser.GetInstance().AlertAccept();
+            steps.Login(users[0].Login, users[0].Password);
+            steps.OpenUserMailBox();
+            steps.SendLetter(users[1].Email, subject, message);
             steps.Logout();
-            steps.ReLogin(user.Login2, user.Password2);
-            pages.Mail.getLetterBySubject(subject).Click();
+            Browser.GetInstance().AlertAccept();
+            steps.ReLogin(users[1].Login, users[1].Password);
+            pages.Mail.LetterBySubject(subject).Click();
             string actualMessage = pages.Mail.OpenedLetterMessageArea.GetText();
             string actualSubject = pages.Mail.OpenedLetterSubjectArea.GetText();
             softAssertions.Add("message", message, actualMessage);
@@ -69,23 +66,23 @@ namespace yandexTests.Tests
         public void SendLetterBySMTP()
         {
             SoftAssertions softAssertions = new SoftAssertions();
-            User user = new TestDataReader().GetTestUser();
+            List<User> users = new TestDataReader().GetTestUsers();
             RandomString randomString = new RandomString();
             WebPages pages = new WebPages();
-            MailSteps steps = new MailSteps();
+            MailSteps steps = new MailSteps(pages, users);
             SmtpHelpers smtp = new SmtpHelpers();
             string subject = randomString.GetRandomString();
             string message = randomString.GetRandomString();
 
-            MailMessage mailMessage = smtp.GetMailMessage(user.Email1, subject, message);
-            smtp.AddRecipient(mailMessage, user.Email2);
-            SmtpClient smtpClient = smtp.GetClient(user.Email1, user.Password1SMTP);
+            MailMessage mailMessage = smtp.GetMailMessage(users[0].Email, subject, message);
+            smtp.AddRecipient(mailMessage, users[1].Email);
+            SmtpClient smtpClient = smtp.GetClient(users[0].Email, users[0].PasswordSMTP);
             smtp.SendLetter(smtpClient, mailMessage);
 
             pages.MainPage.Open();
-            steps.Login(user.Login2, user.Password2);
-            steps.OpenMail();
-            pages.Mail.getLetterBySubject(subject).Click();
+            steps.Login(users[1].Login, users[1].Password);
+            steps.OpenUserMailBox();
+            pages.Mail.LetterBySubject(subject).Click();
             string actualMessage = pages.Mail.OpenedLetterMessageArea.GetText();
             string actualSubject = pages.Mail.OpenedLetterSubjectArea.GetText();
             softAssertions.Add("message", message, actualMessage);

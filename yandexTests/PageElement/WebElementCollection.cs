@@ -5,9 +5,9 @@ namespace yandexTests.PageElement
 {
     public class WebElementCollection
     {
-        private List<IWebElement>? Elements;
         private readonly Browser Browser = Browser.GetInstance();
-        private readonly string XPath;
+        private List<IWebElement>? Elements { get; set; }
+        private string XPath { get; set; }
 
         public WebElementCollection(string xpath)
         {
