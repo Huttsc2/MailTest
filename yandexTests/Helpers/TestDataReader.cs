@@ -12,9 +12,9 @@ namespace yandexTests.Helpers
             JsonDocument jsonDocument = JsonDocument.Parse(jsonString);
             List<User> users = new List<User>();
 
-            foreach (var userElement in jsonDocument.RootElement.GetProperty("users").EnumerateArray())
+            foreach (JsonElement userElement in jsonDocument.RootElement.GetProperty("users").EnumerateArray())
             {
-                var user = new User
+                User user = new User
                 {
                     Login = userElement.GetProperty("login").GetString(),
                     Email = userElement.GetProperty("email").GetString(),

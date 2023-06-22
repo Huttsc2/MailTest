@@ -1,49 +1,65 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using yandexTests.LetterCreating;
+using yandexTests.MailData;
 
 namespace yandexTests.SMTP
 {
     public class SmtpHelpers
     {
-        public MailMessage GetMailMessage(string email, string subject, string message)
+        private static MailMessage MailMessage {  get; set; }
+        private static SmtpClient SmtpClient { get; set; }
+        private static Letter Letter { get; set; }
+        private static User Sender { get; set; }
+        private static User Recipient { get; set; }
+
+        public SmtpHelpers(Letter letter, User sender, User recipient)
         {
-            MailMessage mailMessage = new MailMessage();
-            mailMessage.From = new MailAddress(email);
-            mailMessage.Subject = subject;
-            mailMessage.Body = message;
-            mailMessage.BodyEncoding = System.Text.Encoding.UTF8;
-            return mailMessage;
+            SmtpClient = new SmtpClient();
+            MailMessage = new MailMessage();
+            Letter = letter;
+            Sender = sender;
+            Recipient = recipient;
         }
 
-        public SmtpClient GetClient(string email, string password)
+        public void SmtpInit()
         {
-            SmtpClient client = new SmtpClient();
-            client.Port = 587;
-            client.EnableSsl = true;
-            client.UseDefaultCredentials = false;
-            client.Host = "smtp.yandex.ru";
-            client.Credentials = new NetworkCredential(email, password);
-            client.DeliveryMethod = SmtpDeliveryMethod.Network;
-            return client;
+            SetMailMessage();
+            SetClient();
+            AddRecipient();
         }
 
-        public void AddRecipient(MailMessage mailMessage, string email)
+        private void SetMailMessage()
         {
-            mailMessage.To.Add(new MailAddress(email));
+            MailMessage.From = new MailAddress(Sender.Email);
+            MailMessage.Subject = Letter.GetSubject();
+            MailMessage.Body = Letter.GetMessage();
+            MailMessage.BodyEncoding = System.Text.Encoding.UTF8;
         }
 
-        public void SendLetter(SmtpClient client, MailMessage message)
+        private void SetClient()
         {
-            try
-            {
-                client.Send(message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("letter was not delivered");
-                Console.WriteLine(ex.ToString());
-                Assert.Fail();
-            }
+            SmtpClient.Port = 587;
+            SmtpClient.EnableSsl = true;
+            SmtpClient.UseDefaultCredentials = false;
+            SmtpClient.Host = "smtp.yandex.ru";
+            SmtpClient.Credentials = new NetworkCredential(Sender.Email, Sender.PasswordSMTP);
+            SmtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
+        }
+
+        private void AddRecipient()
+        {
+            MailMessage.To.Add(new MailAddress(Recipient.Email));
+        }
+
+        public void AddRecipient(string email)
+        {
+            MailMessage.To.Add(new MailAddress(email));
+        }
+
+        public void SendLetter()
+        {
+            SmtpClient.Send(MailMessage);
         }
     }
 }

@@ -19,7 +19,7 @@ namespace yandexTests.MailData
             Couter = 0;
         }
 
-        public User GetUser()
+        public User GetNewTestUser()
         {
             User = UsersData[Couter];
             Couter++;

@@ -1,35 +1,37 @@
 ﻿using yandexTests.MailData;
 using yandexTests.Pages;
+using yandexTests.LetterCreating;
 
 namespace yandexTests.Steps
 {
     public class MailSteps
     {
-        private WebPages Pages { get; set; }
+        private static WebPages Pages { get; set; }
+
 
         public MailSteps(WebPages pages)
         {
             Pages = pages;
         }
-        public void Login(string login, string password)
+        public void Login(User user)
         {
             Pages.MainPage.LogInButton.Click();
-            EnterLoginAndPassword(login, password);
+            EnterLoginAndPassword(user);
         }
 
-        public void ReLogin(string login, string password)
+        public void ReLogin(User user)
         {
             Pages.MainPage.LogInButton.Click();
             Pages.PassportPage.CurrentAccountButton.Click();
             Pages.PassportPage.AddAccountButton.Click();
-            EnterLoginAndPassword(login,password);
+            EnterLoginAndPassword(user);
         }
 
-        public void EnterLoginAndPassword(string login, string password)
+        public void EnterLoginAndPassword(User user)
         {
-            Pages.PassportPage.UserNameArea.SendKey(login);
+            Pages.PassportPage.UserNameArea.SendKey(user.Login);
             Pages.PassportPage.SubmitButton.Click();
-            Pages.PassportPage.PasswordArea.SendKey(password);
+            Pages.PassportPage.PasswordArea.SendKey(user.Password);
             Pages.PassportPage.SubmitButton.Click();
         }
 
@@ -39,12 +41,12 @@ namespace yandexTests.Steps
             Pages.Mail.ExitButton.Click();
         }
 
-        public void SendLetter(string recipient, string subject, string message)
+        public void SendLetter(Letter letter)
         {
             Pages.Mail.WriteLetterButton.Click();
-            Pages.Mail.LetterRecipientArea.SendKey(recipient);
-            Pages.Mail.SubjectArea.SendKey(subject);
-            Pages.Mail.MessageArea.SendKey(message);
+            Pages.Mail.LetterRecipientArea.SendKey(letter.GetRecipient());
+            Pages.Mail.SubjectArea.SendKey(letter.GetSubject());
+            Pages.Mail.MessageArea.SendKey(letter.GetMessage());
             Pages.Mail.SendMessageButton.Click();
         }
 
@@ -54,7 +56,7 @@ namespace yandexTests.Steps
             return Pages.MainPage.UserName.GetText();
         }
 
-        public void OpenUserMailBox()
+        public void OpenUserMailbox()
         {
             Pages.MainPage.UserPicButton.Click();
             Pages.MainPage.OpenMailButton.Click();

@@ -67,6 +67,9 @@ csharp_style_conditional_delegate_call = true:suggestion
 csharp_space_around_binary_operators = before_and_after
 csharp_style_prefer_switch_expression = true:suggestion
 
+# CS8602: Разыменование вероятной пустой ссылки.
+dotnet_diagnostic.CS8602.severity = silent
+
 [*.vb]
 #### Стили именования ####
 

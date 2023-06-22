@@ -5,6 +5,7 @@ using yandexTests.Helpers;
 using yandexTests.MailData;
 using yandexTests.Steps;
 using yandexTests.SMTP;
+using yandexTests.LetterCreating;
 
 namespace yandexTests.Tests
 {
@@ -23,18 +24,19 @@ namespace yandexTests.Tests
         {
             Browser.GetInstance().Quit();
         }
-
+        
         [TestMethod]
         public void LogIn()
         {
-            UserList userList = new UserList();
             WebPages pages = new WebPages();
             SoftAssertions softAssertions = new SoftAssertions();
-            MailSteps steps = new MailSteps(pages);
-            User user = userList.GetUser();
+            MailSteps step = new MailSteps(pages);
+            User user = new UserList().GetNewTestUser();
+
             pages.MainPage.Open();
-            steps.Login(user.Login, user.Password);
-            softAssertions.Add("login", user.Login, steps.GetUserName());
+            step.Login(user);
+
+            softAssertions.Add("login", user.Login, step.GetUserName());
             softAssertions.AssertAll();
         }
 
@@ -42,56 +44,61 @@ namespace yandexTests.Tests
         public void SendLetter()
         {
             UserList userList = new UserList();
-            User sender = userList.GetUser();
-            User recepinet = userList.GetUser();
+            User sender = userList.GetNewTestUser();
+            User recepinet = userList.GetNewTestUser();
             WebPages pages = new WebPages();
-            RandomString randomString = new RandomString();
+            Letter letter = new Letter(recepinet);
             SoftAssertions softAssertions = new SoftAssertions();
-            MailSteps steps = new MailSteps(pages);
-            string subject = randomString.GetRandomString();
-            string message = randomString.GetRandomString();
+            MailSteps step = new MailSteps(pages);
+
             pages.MainPage.Open();
-            steps.Login(sender.Login, sender.Password);
-            steps.OpenUserMailBox();
-            steps.SendLetter(recepinet.Email, subject, message);
-            steps.Logout();
+            step.Login(sender);
+            step.OpenUserMailbox();
+            step.SendLetter(letter);
+            step.Logout();
             Browser.GetInstance().AlertAccept();
-            steps.ReLogin(recepinet.Login, recepinet.Password);
-            pages.Mail.LetterBySubject(subject).Click();
+            step.ReLogin(recepinet);
+            pages.Mail.LetterBySubject(letter.GetSubject()).Click();
+
             string actualMessage = pages.Mail.OpenedLetterMessageArea.GetText();
             string actualSubject = pages.Mail.OpenedLetterSubjectArea.GetText();
-            softAssertions.Add("message", message, actualMessage);
-            softAssertions.Add("subject", subject, actualSubject);
+            softAssertions.Add("message", letter.GetMessage(), actualMessage);
+            softAssertions.Add("subject", letter.GetSubject(), actualSubject);
             softAssertions.AssertAll();
         }
-
+        
         [TestMethod]
         public void SendLetterBySMTP()
         {
             SoftAssertions softAssertions = new SoftAssertions();
             UserList userList = new UserList();
-            RandomString randomString = new RandomString();
+            User sender = userList.GetNewTestUser();
+            User recepinet = userList.GetNewTestUser();
             WebPages pages = new WebPages();
             MailSteps steps = new MailSteps(pages);
-            SmtpHelpers smtp = new SmtpHelpers();
-            User sender = userList.GetUser();
-            User recepinet = userList.GetUser();
-            string subject = randomString.GetRandomString();
-            string message = randomString.GetRandomString();
+            Letter letter = new Letter(recepinet);
+            SmtpHelpers smtp = new SmtpHelpers(letter, sender, recepinet);
 
-            MailMessage mailMessage = smtp.GetMailMessage(sender.Email, subject, message);
-            smtp.AddRecipient(mailMessage, recepinet.Email);
-            SmtpClient smtpClient = smtp.GetClient(sender.Email, sender.PasswordSMTP);
-            smtp.SendLetter(smtpClient, mailMessage);
-
+            smtp.SmtpInit();
+            try
+            {
+                smtp.SendLetter();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("letter was not delivered");
+                Console.WriteLine(ex.ToString());
+                Assert.Fail();
+            }
             pages.MainPage.Open();
-            steps.Login(recepinet.Login, recepinet.Password);
-            steps.OpenUserMailBox();
-            pages.Mail.LetterBySubject(subject).Click();
+            steps.Login(recepinet);
+            steps.OpenUserMailbox();
+            pages.Mail.LetterBySubject(letter.GetSubject()).Click();
+
             string actualMessage = pages.Mail.OpenedLetterMessageArea.GetText();
             string actualSubject = pages.Mail.OpenedLetterSubjectArea.GetText();
-            softAssertions.Add("message", message, actualMessage);
-            softAssertions.Add("subject", subject, actualSubject);
+            softAssertions.Add("message", letter.GetMessage(), actualMessage);
+            softAssertions.Add("subject", letter.GetSubject(), actualSubject);
             softAssertions.AssertAll();
         }
     }
