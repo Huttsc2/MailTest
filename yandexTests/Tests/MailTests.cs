@@ -1,6 +1,5 @@
 using yandexTests.Driver;
 using yandexTests.Pages;
-using System.Net.Mail;
 using yandexTests.Helpers;
 using yandexTests.MailData;
 using yandexTests.Steps;

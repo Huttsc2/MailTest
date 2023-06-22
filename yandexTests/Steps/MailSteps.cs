@@ -6,7 +6,7 @@ namespace yandexTests.Steps
 {
     public class MailSteps
     {
-        private static WebPages Pages { get; set; }
+        private static WebPages? Pages { get; set; }
 
 
         public MailSteps(WebPages pages)
