@@ -7,7 +7,7 @@ namespace yandexTests.Steps
     {
         private WebPages Pages { get; set; }
 
-        public MailSteps(WebPages pages, List<User> user)
+        public MailSteps(WebPages pages)
         {
             Pages = pages;
         }
@@ -48,7 +48,7 @@ namespace yandexTests.Steps
             Pages.Mail.SendMessageButton.Click();
         }
 
-        public string GetLogin()
+        public string GetUserName()
         {
             Pages.MainPage.UserPicButton.Click();
             return Pages.MainPage.UserName.GetText();

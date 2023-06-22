@@ -27,33 +27,36 @@ namespace yandexTests.Tests
         [TestMethod]
         public void LogIn()
         {
-            List<User> users = new TestDataReader().GetTestUsers();
+            UserList userList = new UserList();
             WebPages pages = new WebPages();
             SoftAssertions softAssertions = new SoftAssertions();
-            MailSteps steps = new MailSteps(pages, users);
+            MailSteps steps = new MailSteps(pages);
+            User user = userList.GetUser();
             pages.MainPage.Open();
-            steps.Login(users[1].Login, users[1].Password);
-            softAssertions.Add("login", users[1].Login, steps.GetLogin());
+            steps.Login(user.Login, user.Password);
+            softAssertions.Add("login", user.Login, steps.GetUserName());
             softAssertions.AssertAll();
         }
 
         [TestMethod]
         public void SendLetter()
         {
-            List<User> users = new TestDataReader().GetTestUsers();
+            UserList userList = new UserList();
+            User sender = userList.GetUser();
+            User recepinet = userList.GetUser();
             WebPages pages = new WebPages();
             RandomString randomString = new RandomString();
             SoftAssertions softAssertions = new SoftAssertions();
-            MailSteps steps = new MailSteps(pages, users);
+            MailSteps steps = new MailSteps(pages);
             string subject = randomString.GetRandomString();
             string message = randomString.GetRandomString();
             pages.MainPage.Open();
-            steps.Login(users[0].Login, users[0].Password);
+            steps.Login(sender.Login, sender.Password);
             steps.OpenUserMailBox();
-            steps.SendLetter(users[1].Email, subject, message);
+            steps.SendLetter(recepinet.Email, subject, message);
             steps.Logout();
             Browser.GetInstance().AlertAccept();
-            steps.ReLogin(users[1].Login, users[1].Password);
+            steps.ReLogin(recepinet.Login, recepinet.Password);
             pages.Mail.LetterBySubject(subject).Click();
             string actualMessage = pages.Mail.OpenedLetterMessageArea.GetText();
             string actualSubject = pages.Mail.OpenedLetterSubjectArea.GetText();
@@ -66,21 +69,23 @@ namespace yandexTests.Tests
         public void SendLetterBySMTP()
         {
             SoftAssertions softAssertions = new SoftAssertions();
-            List<User> users = new TestDataReader().GetTestUsers();
+            UserList userList = new UserList();
             RandomString randomString = new RandomString();
             WebPages pages = new WebPages();
-            MailSteps steps = new MailSteps(pages, users);
+            MailSteps steps = new MailSteps(pages);
             SmtpHelpers smtp = new SmtpHelpers();
+            User sender = userList.GetUser();
+            User recepinet = userList.GetUser();
             string subject = randomString.GetRandomString();
             string message = randomString.GetRandomString();
 
-            MailMessage mailMessage = smtp.GetMailMessage(users[0].Email, subject, message);
-            smtp.AddRecipient(mailMessage, users[1].Email);
-            SmtpClient smtpClient = smtp.GetClient(users[0].Email, users[0].PasswordSMTP);
+            MailMessage mailMessage = smtp.GetMailMessage(sender.Email, subject, message);
+            smtp.AddRecipient(mailMessage, recepinet.Email);
+            SmtpClient smtpClient = smtp.GetClient(sender.Email, sender.PasswordSMTP);
             smtp.SendLetter(smtpClient, mailMessage);
 
             pages.MainPage.Open();
-            steps.Login(users[1].Login, users[1].Password);
+            steps.Login(recepinet.Login, recepinet.Password);
             steps.OpenUserMailBox();
             pages.Mail.LetterBySubject(subject).Click();
             string actualMessage = pages.Mail.OpenedLetterMessageArea.GetText();
