@@ -1,5 +1,6 @@
 ﻿using yandexTests.Driver;
 using OpenQA.Selenium;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace yandexTests.PageElement
 {
@@ -51,14 +52,7 @@ namespace yandexTests.PageElement
         {
             if (Element == null)
             {
-                try
-                {
-                    throw new Exception("Element with xpath '" + XPath + "' is not found");
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.StackTrace);
-                }
+                Assert.Fail();
             }
         }
 

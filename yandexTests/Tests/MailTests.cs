@@ -42,7 +42,11 @@ namespace yandexTests.Tests
         public void SendLetter()
         {
             Users users = new TestDataReader().GetTestUsers();
-            Letter letter = new Letter(users.Recipient);
+            Letter letter = new LetterBuilder()
+                .SetRecipient(users.Recipient.Email)
+                .SetSubject(new RandomString().GetRandomString())
+                .SetMessage(new RandomString().GetRandomString())
+                .Build();
             SoftAssertions softAssertions = new SoftAssertions();
 
             new WebPages().MainPage.Open();
@@ -52,12 +56,12 @@ namespace yandexTests.Tests
             new MailSteps().Logout();
             Browser.GetInstance().AlertAccept();
             new MailSteps().ReLogin(users.Recipient);
-            new WebPages().Mail.LetterBySubject(letter.GetSubject()).Click();
+            new WebPages().Mail.LetterBySubject(letter.Subject).Click();
 
             string actualMessage = new WebPages().Mail.OpenedLetterMessageArea.GetText();
             string actualSubject = new WebPages().Mail.OpenedLetterSubjectArea.GetText();
-            softAssertions.Add("message", letter.GetMessage(), actualMessage);
-            softAssertions.Add("subject", letter.GetSubject(), actualSubject);
+            softAssertions.Add("message", letter.Message, actualMessage);
+            softAssertions.Add("subject", letter.Subject, actualSubject);
             softAssertions.AssertAll();
         }
         
@@ -65,21 +69,25 @@ namespace yandexTests.Tests
         public void SendLetterBySMTP()
         {
             Users users = new TestDataReader().GetTestUsers();
-            Letter letter = new Letter(users.Recipient);
+            Letter letter = new LetterBuilder()
+                .SetRecipient(users.Recipient.Email)
+                .SetSubject(new RandomString().GetRandomString())
+                .SetMessage(new RandomString().GetRandomString())
+                .Build() ;
             SoftAssertions softAssertions = new SoftAssertions();
-            SmtpHelpers smtp = new SmtpHelpers(letter, users.Sender, users.Recipient);
+            SmtpHelper smtp = new SmtpHelper(letter, users.Sender, users.Recipient);
 
             smtp.SmtpInit();
             smtp.SendLetter();
             new WebPages().MainPage.Open();
             new MailSteps().Login(users.Recipient);
             new MailSteps().OpenUserMailbox();
-            new WebPages().Mail.LetterBySubject(letter.GetSubject()).Click();
+            new WebPages().Mail.LetterBySubject(letter.Subject).Click();
 
             string actualMessage = new WebPages().Mail.OpenedLetterMessageArea.GetText();
             string actualSubject = new WebPages().Mail.OpenedLetterSubjectArea.GetText();
-            softAssertions.Add("message", letter.GetMessage(), actualMessage);
-            softAssertions.Add("subject", letter.GetSubject(), actualSubject);
+            softAssertions.Add("message", letter.Message, actualMessage);
+            softAssertions.Add("subject", letter.Subject, actualSubject);
             softAssertions.AssertAll();
         }
     }

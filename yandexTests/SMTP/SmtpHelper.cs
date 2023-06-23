@@ -6,7 +6,7 @@ using yandexTests.MailData;
 
 namespace yandexTests.SMTP
 {
-    public class SmtpHelpers
+    public class SmtpHelper
     {
         private MailMessage MailMessage {  get; set; }
         private SmtpClient SmtpClient { get; set; }
@@ -14,7 +14,7 @@ namespace yandexTests.SMTP
         private User Sender { get; set; }
         private User Recipient { get; set; }
 
-        public SmtpHelpers
+        public SmtpHelper
             (
             Letter letter, 
             User sender, 
@@ -38,8 +38,8 @@ namespace yandexTests.SMTP
         private void SetMailMessage()
         {
             MailMessage.From = new MailAddress(Sender.Email);
-            MailMessage.Subject = Letter.GetSubject();
-            MailMessage.Body = Letter.GetMessage();
+            MailMessage.Subject = Letter.Subject;
+            MailMessage.Body = Letter.Message;
         }
 
         private void SetCredentials()

@@ -44,9 +44,9 @@ namespace yandexTests.Steps
         public void SendLetter(Letter letter)
         {
             Pages.Mail.WriteLetterButton.Click();
-            Pages.Mail.LetterRecipientArea.SendKey(letter.GetRecipient());
-            Pages.Mail.SubjectArea.SendKey(letter.GetSubject());
-            Pages.Mail.MessageArea.SendKey(letter.GetMessage());
+            Pages.Mail.LetterRecipientArea.SendKey(letter.Recipient);
+            Pages.Mail.SubjectArea.SendKey(letter.Subject);
+            Pages.Mail.MessageArea.SendKey(letter.Message);
             Pages.Mail.SendMessageButton.Click();
         }
 
