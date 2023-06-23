@@ -11,10 +11,9 @@ namespace yandexTests.LetterCreating
 
         public Letter(User recipient)
         {
-            RandomString randomString = new RandomString();
             Recipient = recipient.Email;
-            Subject = randomString.GetRandomString();
-            Message = randomString.GetRandomString();
+            Subject = new RandomString().GetRandomString();
+            Message = new RandomString().GetRandomString();
         }
 
         public string GetRecipient()

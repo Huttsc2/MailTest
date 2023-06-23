@@ -10,8 +10,6 @@ namespace yandexTests.Driver
         private readonly IWebDriver driver;
         private static Browser? Instance;
 
-
-
         private Browser()
         {
             driver = StartChromDriver();

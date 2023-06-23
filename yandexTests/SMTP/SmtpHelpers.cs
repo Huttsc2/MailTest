@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using yandexTests.Helpers;
 using yandexTests.LetterCreating;
 using yandexTests.MailData;
 
@@ -13,12 +14,14 @@ namespace yandexTests.SMTP
         private User Sender { get; set; }
         private User Recipient { get; set; }
 
-        public SmtpHelpers(
+        public SmtpHelpers
+            (
             Letter letter, 
             User sender, 
-            User recipient)
+            User recipient
+            )
         {
-            SmtpClient = new SmtpClient();
+            SmtpClient = new SmtpClientDataReader().GetSmtpClient();
             MailMessage = new MailMessage();
             Letter = letter;
             Sender = sender;
@@ -28,7 +31,7 @@ namespace yandexTests.SMTP
         public void SmtpInit()
         {
             SetMailMessage();
-            SetClient();
+            SetCredentials();
             AddRecipient();
         }
 
@@ -37,17 +40,11 @@ namespace yandexTests.SMTP
             MailMessage.From = new MailAddress(Sender.Email);
             MailMessage.Subject = Letter.GetSubject();
             MailMessage.Body = Letter.GetMessage();
-            MailMessage.BodyEncoding = System.Text.Encoding.UTF8;
         }
 
-        private void SetClient()
+        private void SetCredentials()
         {
-            SmtpClient.Port = 587;
-            SmtpClient.EnableSsl = true;
-            SmtpClient.UseDefaultCredentials = false;
-            SmtpClient.Host = "smtp.yandex.ru";
             SmtpClient.Credentials = new NetworkCredential(Sender.Email, Sender.PasswordSMTP);
-            SmtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
         }
 
         private void AddRecipient()

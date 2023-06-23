@@ -71,7 +71,6 @@ namespace yandexTests.Tests
 
             smtp.SmtpInit();
             smtp.SendLetter();
-
             new WebPages().MainPage.Open();
             new MailSteps().Login(users.Recipient);
             new MailSteps().OpenUserMailbox();

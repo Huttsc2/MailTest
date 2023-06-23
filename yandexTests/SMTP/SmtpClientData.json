@@ -1,0 +1,6 @@
+﻿{
+    "port": 587,
+    "host": "smtp.yandex.ru",
+    "enableSsl": true,
+    "useDefaultCredentials": false,
+}
