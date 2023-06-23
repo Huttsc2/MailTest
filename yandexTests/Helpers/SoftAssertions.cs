@@ -4,7 +4,7 @@ namespace yandexTests.Helpers
 {
     public class SoftAssertions
     {
-        private readonly List<SingleAssert> _verifications = new();
+        private List<SingleAssert> _verifications = new();
 
         public void Add(string message, string expected, string actual)
         {

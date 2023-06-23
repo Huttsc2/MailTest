@@ -5,6 +5,7 @@ using yandexTests.MailData;
 using yandexTests.Steps;
 using yandexTests.SMTP;
 using yandexTests.LetterCreating;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace yandexTests.Tests
 {
@@ -27,40 +28,34 @@ namespace yandexTests.Tests
         [TestMethod]
         public void LogIn()
         {
-            WebPages pages = new WebPages();
             SoftAssertions softAssertions = new SoftAssertions();
-            MailSteps step = new MailSteps(pages);
-            User user = new UserList().GetNewTestUser();
+            Users users = new TestDataReader().GetTestUsers();
 
-            pages.MainPage.Open();
-            step.Login(user);
+            new WebPages().MainPage.Open();
+            new MailSteps().Login(users.Sender);
 
-            softAssertions.Add("login", user.Login, step.GetUserName());
+            softAssertions.Add("login", users.Sender.Login, new MailSteps().GetUserName());
             softAssertions.AssertAll();
         }
 
         [TestMethod]
         public void SendLetter()
         {
-            UserList userList = new UserList();
-            User sender = userList.GetNewTestUser();
-            User recepinet = userList.GetNewTestUser();
-            WebPages pages = new WebPages();
-            Letter letter = new Letter(recepinet);
+            Users users = new TestDataReader().GetTestUsers();
+            Letter letter = new Letter(users.Recipient);
             SoftAssertions softAssertions = new SoftAssertions();
-            MailSteps step = new MailSteps(pages);
 
-            pages.MainPage.Open();
-            step.Login(sender);
-            step.OpenUserMailbox();
-            step.SendLetter(letter);
-            step.Logout();
+            new WebPages().MainPage.Open();
+            new MailSteps().Login(users.Sender);
+            new MailSteps().OpenUserMailbox();
+            new MailSteps().SendLetter(letter);
+            new MailSteps().Logout();
             Browser.GetInstance().AlertAccept();
-            step.ReLogin(recepinet);
-            pages.Mail.LetterBySubject(letter.GetSubject()).Click();
+            new MailSteps().ReLogin(users.Recipient);
+            new WebPages().Mail.LetterBySubject(letter.GetSubject()).Click();
 
-            string actualMessage = pages.Mail.OpenedLetterMessageArea.GetText();
-            string actualSubject = pages.Mail.OpenedLetterSubjectArea.GetText();
+            string actualMessage = new WebPages().Mail.OpenedLetterMessageArea.GetText();
+            string actualSubject = new WebPages().Mail.OpenedLetterSubjectArea.GetText();
             softAssertions.Add("message", letter.GetMessage(), actualMessage);
             softAssertions.Add("subject", letter.GetSubject(), actualSubject);
             softAssertions.AssertAll();
@@ -69,33 +64,21 @@ namespace yandexTests.Tests
         [TestMethod]
         public void SendLetterBySMTP()
         {
+            Users users = new TestDataReader().GetTestUsers();
+            Letter letter = new Letter(users.Recipient);
             SoftAssertions softAssertions = new SoftAssertions();
-            UserList userList = new UserList();
-            User sender = userList.GetNewTestUser();
-            User recepinet = userList.GetNewTestUser();
-            WebPages pages = new WebPages();
-            MailSteps steps = new MailSteps(pages);
-            Letter letter = new Letter(recepinet);
-            SmtpHelpers smtp = new SmtpHelpers(letter, sender, recepinet);
+            SmtpHelpers smtp = new SmtpHelpers(letter, users.Sender, users.Recipient);
 
             smtp.SmtpInit();
-            try
-            {
-                smtp.SendLetter();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("letter was not delivered");
-                Console.WriteLine(ex.ToString());
-                Assert.Fail();
-            }
-            pages.MainPage.Open();
-            steps.Login(recepinet);
-            steps.OpenUserMailbox();
-            pages.Mail.LetterBySubject(letter.GetSubject()).Click();
+            smtp.SendLetter();
 
-            string actualMessage = pages.Mail.OpenedLetterMessageArea.GetText();
-            string actualSubject = pages.Mail.OpenedLetterSubjectArea.GetText();
+            new WebPages().MainPage.Open();
+            new MailSteps().Login(users.Recipient);
+            new MailSteps().OpenUserMailbox();
+            new WebPages().Mail.LetterBySubject(letter.GetSubject()).Click();
+
+            string actualMessage = new WebPages().Mail.OpenedLetterMessageArea.GetText();
+            string actualSubject = new WebPages().Mail.OpenedLetterSubjectArea.GetText();
             softAssertions.Add("message", letter.GetMessage(), actualMessage);
             softAssertions.Add("subject", letter.GetSubject(), actualSubject);
             softAssertions.AssertAll();

@@ -20,14 +20,5 @@ namespace yandexTests.Pages.Passport.Mail
         {
             return new WebElement("//span[@title='" + subject + "']");
         }
-
-        public WebElement some
-        {
-            get
-            {
-
-                return new WebElement("");
-            }
-        }
     }
 }

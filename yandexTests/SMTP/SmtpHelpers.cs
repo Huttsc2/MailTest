@@ -7,13 +7,16 @@ namespace yandexTests.SMTP
 {
     public class SmtpHelpers
     {
-        private static MailMessage? MailMessage {  get; set; }
-        private static SmtpClient? SmtpClient { get; set; }
-        private static Letter? Letter { get; set; }
-        private static User? Sender { get; set; }
-        private static User? Recipient { get; set; }
+        private MailMessage MailMessage {  get; set; }
+        private SmtpClient SmtpClient { get; set; }
+        private Letter Letter { get; set; }
+        private User Sender { get; set; }
+        private User Recipient { get; set; }
 
-        public SmtpHelpers(Letter letter, User sender, User recipient)
+        public SmtpHelpers(
+            Letter letter, 
+            User sender, 
+            User recipient)
         {
             SmtpClient = new SmtpClient();
             MailMessage = new MailMessage();

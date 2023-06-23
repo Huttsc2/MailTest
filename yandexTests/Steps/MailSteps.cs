@@ -6,12 +6,12 @@ namespace yandexTests.Steps
 {
     public class MailSteps
     {
-        private static WebPages? Pages { get; set; }
+        private WebPages Pages { get; set; }
 
 
-        public MailSteps(WebPages pages)
+        public MailSteps()
         {
-            Pages = pages;
+            Pages = new WebPages();
         }
         public void Login(User user)
         {
