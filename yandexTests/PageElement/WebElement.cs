@@ -9,35 +9,73 @@ namespace yandexTests.PageElement
         private Browser Browser = Browser.GetInstance();
         private IWebElement? Element { get; set; }
         private string XPath { get; set; }
+        private bool IsHidden { get; set; }
         private int TimeoutInSec = 30;
+        private bool ReloadObject = true;
 
-        public WebElement(string xpath)
+        public WebElement(bool isHidden, string xpath)
         {
             XPath = xpath;
+            IsHidden = isHidden;
         }
 
         public void SetElement(IWebElement element)
         {
             Element = element;
+            ReloadObject = false;
         }
 
         public void Click()
         {
-            Element = Browser.FindClickableElement(XPath, TimeoutInSec);
+            CheckCondition(TimeoutInSec);
+            CheckNull();
             Element.Click();
         }
 
         public void SendKey(string data)
         {
-            Element = Browser.FindClickableElement(XPath, TimeoutInSec);
+            CheckCondition(TimeoutInSec);
+            CheckNull();
             Element.SendKeys(data);
         }
 
 
         public string GetText()
         {
-            Element = Browser.FindClickableElement(XPath, TimeoutInSec);
+            CheckCondition(TimeoutInSec);
+            CheckNull();
             return Element.Text;
+        }
+
+        private void CheckNull()
+        {
+            if (Element == null)
+            {
+                try
+                {
+                    throw new Exception("Element with xpath '" + XPath + "' is not found");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.StackTrace);
+                }
+            }
+        }
+
+        private void CheckCondition(int timeoutInSec)
+        {
+            if (!ReloadObject)
+            {
+                return;
+            }
+            if (!IsHidden)
+            {
+                Element = Browser.FindClickableElement(XPath, timeoutInSec);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

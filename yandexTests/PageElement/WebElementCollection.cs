@@ -9,9 +9,12 @@ namespace yandexTests.PageElement
         private List<IWebElement>? Elements { get; set; }
         private string XPath { get; set; }
 
-        public WebElementCollection(string xpath)
+        private bool IsHidden { get; set; }
+
+        public WebElementCollection(bool isHidden, string xpath)
         {
             XPath = xpath;
+            IsHidden = isHidden;
         }
         public List<WebElement> ConvertToListCollection()
         {
@@ -19,7 +22,7 @@ namespace yandexTests.PageElement
             List<WebElement> newCollectioon = new();
             foreach (IWebElement element in Elements)
             {
-                WebElement newElement = new(XPath);
+                WebElement newElement = new(IsHidden, XPath);
                 newElement.SetElement(element);
                 newCollectioon.Add(newElement);
             }
